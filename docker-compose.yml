@@ -1,0 +1,19 @@
+version: "3"
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/code
+    command: >
+      bash -c "python bin/init.py &&
+               honcho -d . -f /Procfile start"
+    depends_on:
+      - memcached
+    links:
+      - memcached
+  memcached:
+    image: memcached
+    expose:
+      - 11211

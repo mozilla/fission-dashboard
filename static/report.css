@@ -1,0 +1,91 @@
+body {
+    font-size: 13px;
+    color: black;
+}
+
+.info {
+    display: table;
+    width: 100%;
+}
+
+.item {
+    display: table-cell;
+    //width: 33%;
+}
+
+table {
+    border-collapse: collapse;
+    border: 1px solid black;
+    width: 95%;
+}
+
+th, td {
+    padding: 5px;
+    text-align: left;
+    border: 1px solid black;
+}
+
+thead {
+    display: table;
+    background-color: #F8F8F8;
+    overflow: auto;
+    width: calc(100% - 16px);
+}
+
+tbody {
+    display: block;
+    overflow: auto;
+    height: 400px;
+    width: 100%;
+}
+
+td:nth-child(1), th:nth-child(1) { width: 5%; }
+td:nth-child(2), th:nth-child(2) { width: 35%; }
+td:nth-child(3), th:nth-child(3) { width: 10%; }
+td:nth-child(4), th:nth-child(4) { width: 20%; }
+td:nth-child(5), th:nth-child(5) { width: 10%; }
+td:nth-child(6), th:nth-child(6) { width: 10%; }
+td:nth-child(7), th:nth-child(7) { width: 10%; }
+
+.title {
+    margin-top: 35px;
+    text-align: center;
+    font-size: 1.5em;
+    background-color: rgb(11, 52, 125);;
+    color: white;
+    width: 95%;
+    border-radius: 3px;
+}
+
+.tables {
+    width: 100%;
+}
+
+.contact, .resource{
+    display: block;
+}
+
+.item-title {
+    text-align: center;
+    background-color: rgb(229, 229, 229);
+    font-size: 16px;
+    font-weight: bold;
+    font-family: sans-serif;
+    border-radius: 3px;
+    margin: 3px;
+}
+
+.stats {
+    display: table;
+    width: 80%;
+}
+
+.row {
+    display: table-row;
+    width: 100%;
+}
+
+.row .item {
+    display: table-cell;
+    width: 50%;
+}

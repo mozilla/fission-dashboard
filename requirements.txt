@@ -1,0 +1,6 @@
+libmozdata>=0.1.48
+flask>=1.0.2
+honcho>=1.0.1
+gunicorn>=19.9.0
+apscheduler>=3.6.0
+python-binary-memcached>=0.28.0

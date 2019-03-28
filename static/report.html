@@ -1,0 +1,99 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+     - You can obtain one at http://mozilla.org/MPL/2.0/.  -->
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Fission status</title>
+    <script src="report.js"></script>
+    <script type="text/javascript">
+      init();
+    </script>
+    <link rel="stylesheet" href="report.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>
+  </head>
+  <body>
+    <div class="info">
+      <div class="stats">
+        <div class="row">
+          <div class="item">
+            <div class="item-title">Tickets Per Milestone Total=<span id="total-milestones"></span></div>
+            <div>
+              <canvas id="canvas_ticket_per_milestone"></canvas>
+            </div>
+          </div>
+          <div class="item">
+            <div class="item-title">Per DOM Component</div>
+            <div>
+              <canvas id="canvas_per_dom_component"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="item">
+            <div class="item-title">Bug Status</div>
+            <div>
+              <canvas id="canvas_bug_status"></canvas>
+            </div>
+          </div>
+          <div class="item">
+            <div class="item-title">M2 Milestones</div>
+            <div>
+              <canvas id="canvas_m2_milestones"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-title">Key Resources</div>
+        <div class="resources">
+          <span class="resource"><a href="https://wiki.mozilla.org/Project_Fission" target="_blank">Fission Wiki</a></span>
+          <span class="resource"><a href="https://bugzilla.mozilla.org/buglist.cgi?classification=Client%20Software&classification=Developer%20Infrastructure&classification=Components&classification=Server%20Software&classification=Other&columnlist=product%2Ccomponent%2Cassigned_to%2Cshort_desc%2Cbug_status%2Cresolution%2Cstatus_whiteboard&f1=cf_fission_milestone&o1=equals&v1=M1&list_id=14636475" target="_blank">M1 Query</a></span>
+          <span class="resource"><a href="https://bugzilla.mozilla.org/buglist.cgi?o1=equals&v1=M2&f1=cf_fission_milestone&columnlist=product%2Ccomponent%2Cassigned_to%2Cshort_desc%2Cbug_status%2Cresolution%2Cstatus_whiteboard&classification=Client%20Software&classification=Developer%20Infrastructure&classification=Components&classification=Server%20Software&classification=Other&query_format=advanced&list_id=14636476" target="_blank">M2 Query</a></span>
+          <span class="resource"><a href="https://docs.google.com/spreadsheets/d/1jwYDrq0FDD0qNEN_-SXxgOAtaj15hGfH4Xna1v4qrec/edit#gid=0" target="_blank">Work Breakdown Document</a></span>
+          <span class="resource"><a href="https://mystor.github.io/fission-news-1.html" target="_blank">Fission Newsletter #1</a></span>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-title">Key Contacts</div>
+        <div class="contacts">
+          <span class="contact"><a href="https://wiki.mozilla.org/Project_Fission#Team" target="_blank">Fission Team List (Wiki)</a></span>
+          <span class="contact">Engineering Project Manager: Ron Manning</span>
+          <span class="contact">Product Manager: Kev Needham</span>
+          <span class="contact">Project Tech Lead: Nika Layzell</span>
+          <span class="contact">Accessibility Lead: James Teh</span>
+          <span class="contact">DevTools Engineering Manager: Soledad Penadés</span>
+          <span class="contact">DevTools Engineering: Alexandre Poirot</span>
+          <span class="contact">DevTools Engineering: Yulia Startsev</span>
+          <span class="contact">DOM Engineering Manager: Neha Kochar</span>
+          <span class="contact">DOM Engineering: Kyle Machulis</span>
+          <span class="contact">DOM Engineering: Peter Van Der Beken</span>
+          <span class="contact">DOM Engineering: Andreas Farre</span>
+          <span class="contact">DOM Engineering: Alphan Chen</span>
+          <span class="contact">DOM Engineering: John Dai</span>
+          <span class="contact">DOM Engineering: Henri Sivonen</span>
+          <span class="contact">DOM Consultant: Ehsan Akhgari</span>
+          <span class="contact">FrontEnd Engineering: Felipe Gomes</span>
+          <span class="contact">FrontEnd Engineering: Mike Conley</span>
+          <span class="contact">Graphics Engineering: Ryan Hunt</span>
+          <span class="contact">JS/WASM Security Consultant: Luke Wagner</span>
+          <span class="contact">Memshrink Lead: Eric Rahm</span>
+          <span class="contact">Memshrink Engineering: Kris Maglione</span>
+          <span class="contact">Layout Lead: Jonathan Watt</span>
+          <span class="contact">Media and WebRTC Lead: Nils Ohlmeier</span>
+          <span class="contact">Necko Engineering: Valentin Gosu</span>
+          <span class="contact">Necko Engineering: Dragana Damjanovic</span>
+          <span class="contact">Office-of-CTO Consultant: Boris Zbarsky</span>
+          <span class="contact">Security Lead: Tom Ritter</span>
+          <span class="contact">Standards Lead: Anne van Kesteren</span>
+        </div>
+      </div>
+    </div>
+    <div id="all-tables" class="tables">
+    </div>
+  </body>
+</html>
+
