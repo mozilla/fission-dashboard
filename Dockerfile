@@ -14,7 +14,9 @@ ENV MEMCACHEDCLOUD_PASSWORD=
 ENV PORT=5000
 ENV PYTHONPATH=.
 ENV PYTHONUNBUFFERED=1
-    
+ENV CLIENT_SECRETS=''
+ENV SESSION_KEY=abcdefghiklmnop
+
 WORKDIR /tmp
 
 ADD requirements.txt /tmp/requirements.txt
