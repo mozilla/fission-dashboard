@@ -91,7 +91,7 @@ function mkTable(M, data) {
   const table = document.createElement("table");
   div.appendChild(title);
   div.appendChild(table);
-  
+
   const thead = document.createElement("thead");
   table.appendChild(thead);
   const trHead = document.createElement("tr");
@@ -139,7 +139,12 @@ function mkTable(M, data) {
 
     tbody.appendChild(tr);
   }
-  return div;
+  return [div, thead, tbody];
+}
+
+function resize(thead, tbody) {
+  const scrollWidth = tbody.offsetWidth - tbody.clientWidth + 1;
+  thead.style.width = `calc(100% - ${scrollWidth}px)`;
 }
 
 function updateTables(data) {
@@ -147,19 +152,17 @@ function updateTables(data) {
   const allTables = document.getElementById("all-tables");
   const milestones = ["M2", "M3", "?", "Future", "M1"];
   const children = allTables.children;
-  if (children.length == 0) {
-    for (let i in milestones) {
-      const M = milestones[i];
-      const table = mkTable(M, tables[M]);
+  const add = children.length == 0;
+  for (let i in milestones) {
+    const M = milestones[i];
+    const [table, thead, tbody] = mkTable(M, tables[M]);
+    if (add) {
       allTables.appendChild(table);
-    }
-  } else {
-    for (let i in milestones) {
-      const M = milestones[i];
-      const table = mkTable(M, tables[M]);
+    } else {
       allTables.replaceChild(table, children[i]);
     }
-  }  
+    resize(thead, tbody);
+  }
 }
 
 function updateAll(data) {

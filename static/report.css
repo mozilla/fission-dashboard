@@ -10,7 +10,6 @@ body {
 
 .item {
     display: table-cell;
-    //width: 33%;
 }
 
 table {
@@ -29,7 +28,7 @@ thead {
     display: table;
     background-color: #F8F8F8;
     overflow: auto;
-    width: calc(100% - 16px);
+    width: 100%;
 }
 
 tbody {
