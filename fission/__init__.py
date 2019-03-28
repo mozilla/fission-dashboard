@@ -108,6 +108,9 @@ def default():
 
 @app.route('/data')
 def data():
+    if 'credentials' in flask.session:
+        return jsonify(cache.get_data())
+
     r = check_credentials()
     if r:
         return r
