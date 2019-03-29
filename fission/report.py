@@ -110,7 +110,7 @@ def mk_doughnut(data):
 
 def get_stats(bugs):
     m2 = [bug['id'] for bug in bugs if bug['cf_fission_milestone'] == 'M2']
-    m2_patch = get_bugs_with_patch(m2)
+    m2_patch = set()#get_bugs_with_patch(m2)
 
     total_milestones = len(bugs)
     milestones = {'M1': [], 'M2': [], 'M3': [], '?': [], 'Future': []}
