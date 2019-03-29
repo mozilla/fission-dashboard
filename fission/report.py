@@ -5,6 +5,13 @@
 from libmozdata.bugzilla import Bugzilla
 
 
+MIMES = {
+    'text/x-phabricator-request',
+    'text/x-github-pull-request',
+    'text/x-review-board-request',
+}
+
+
 def get_params():
     params = {
         'include_fields': [
@@ -41,6 +48,25 @@ def get_bugs():
     ).get_data().wait()
 
     return bugs
+
+
+def get_bugs_with_patch(bugids):
+    def attachment_handler(attachments, bugid, data):
+        for attachment in attachments:
+            if attachment['is_obsolete'] == 0 and attachment['content_type'] in MIMES:
+                data.add(int(bugid))
+                break
+
+    data = set()
+
+    Bugzilla(
+        bugids=bugids,
+        attachmenthandler=attachment_handler,
+        attachmentdata=data,
+        attachment_include_fields=['bug_id', 'is_obsolete', 'content_type'],
+    ).get_data().wait()
+
+    return data
 
 
 def is_dom(comp):
@@ -83,6 +109,9 @@ def mk_doughnut(data):
 
 
 def get_stats(bugs):
+    m2 = [bug['id'] for bug in bugs if bug['cf_fission_milestone'] == 'M2']
+    m2_patch = get_bugs_with_patch(m2)
+
     total_milestones = len(bugs)
     milestones = {'M1': [], 'M2': [], 'M3': [], '?': [], 'Future': []}
     milestones_stats = {k: 0 for k in milestones.keys()}
@@ -99,6 +128,8 @@ def get_stats(bugs):
         status[s] = status.get(s, 0) + 1
 
         if m == 'M2' and s in {'NEW', 'ASSIGNED', 'RESOLVED'}:
+            if bug['id'] in m2_patch:
+                s += ' with patch'
             status_m2[s] = status_m2.get(s, 0) + 1
 
         c = bug['component']
