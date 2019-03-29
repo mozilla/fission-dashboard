@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from fission import cache
+from fission.logger import logger
 
 
 while True:
@@ -10,4 +11,5 @@ while True:
         cache.update()
         break
     except:  # NOQA
+        logger.exception("Cannot init")
         pass
