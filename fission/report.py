@@ -2,7 +2,13 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from bisect import bisect_left as bisect
+import datetime
+import dateutil.parser
+import libmozdata.utils as lmdutils
 from libmozdata.bugzilla import Bugzilla
+from libmozdata.connection import Connection
+import pytz
 
 
 MIMES = {
@@ -10,12 +16,23 @@ MIMES = {
     'text/x-github-pull-request',
     'text/x-review-board-request',
 }
+Connection.CHUNK_SIZE = 128
+M2_START_DATE = '2019-02-25'
+M2_END_DATE = '2019-05-06'
+
+
+def get_date(s):
+    return dateutil.parser.parse(s).replace(tzinfo=pytz.utc)
+
+
+def get_prev_monday(d):
+    return d + datetime.timedelta(days=-d.weekday())
 
 
 def get_params():
     params = {
         'include_fields': [
-            'triage_owner',
+            'creation_time',
             'component',
             'cf_fission_milestone',
             'status',
@@ -35,7 +52,6 @@ def get_params():
 def get_bugs():
     def bug_handler(bug, data):
         del bug['assigned_to_detail']
-        del bug['triage_owner_detail']
         if not bug['resolution']:
             bug['resolution'] = '---'
         data.append(bug)
@@ -50,20 +66,45 @@ def get_bugs():
     return bugs
 
 
-def get_bugs_with_patch(bugids):
+def get_milestone_extra_info(bugs, M):
     def attachment_handler(attachments, bugid, data):
         for attachment in attachments:
             if attachment['is_obsolete'] == 0 and attachment['content_type'] in MIMES:
-                data.add(int(bugid))
+                data[int(bugid)]['patch'] = True
                 break
 
-    data = set()
+    def history_handler(bug, data):
+        bugid = bug['id']
+        d = data[bugid]
+        for h in bug['history']:
+            for c in h['changes']:
+                if c.get('field_name') == 'status':
+                    if c.get('added') == 'RESOLVED':
+                        d['dates'].append(get_date(h['when']))
+                        d['states'].append(True)
+                    elif (
+                        c.get('removed') == 'RESOLVED' and c.get('added') != 'VERIFIED'
+                    ):
+                        d['dates'].append(get_date(h['when']))
+                        d['states'].append(False)
+
+    data = {}
+    for bug in bugs:
+        if bug['cf_fission_milestone'] != M:
+            continue
+        data[bug['id']] = {
+            'dates': [get_date(bug['creation_time'])],
+            'states': [False],
+            'patch': False,
+        }
 
     Bugzilla(
-        bugids=bugids,
+        bugids=list(data.keys()),
         attachmenthandler=attachment_handler,
         attachmentdata=data,
         attachment_include_fields=['bug_id', 'is_obsolete', 'content_type'],
+        historyhandler=history_handler,
+        historydata=data,
     ).get_data().wait()
 
     return data
@@ -71,6 +112,72 @@ def get_bugs_with_patch(bugids):
 
 def is_dom(comp):
     return comp.startswith('DOM: ') or comp == 'Document Navigation'
+
+
+def mk_weeks(start, end):
+    start = lmdutils.get_date_ymd(start)
+    start = get_prev_monday(start)
+    end = lmdutils.get_date_ymd(end)
+    weeks = []
+    while start < end:
+        weeks.append(
+            {
+                'start': start,
+                'end': start + datetime.timedelta(days=6),
+                'resolved': 0,
+                'unresolved': 0,
+            }
+        )
+        start += datetime.timedelta(days=7)
+    return weeks
+
+
+def state_for_week(start, end, info):
+    dates = info['dates']
+    states = info['states']
+    i = bisect(dates, end)
+    if i == len(dates):
+        return states[i - 1]
+
+    if dates[i] == end:
+        return states[i]
+
+    if i == 0:
+        return None
+
+    return states[i - 1]
+
+
+def mk_weeks_stats(weeks, data):
+    for info in data.values():
+        for week in weeks:
+            x = state_for_week(week['start'], week['end'], info)
+            if x is not None:
+                if x:
+                    week['resolved'] += 1
+                else:
+                    week['unresolved'] += 1
+
+
+def mk_burndown(start, end, data):
+    weeks = mk_weeks(start, end)
+    mk_weeks_stats(weeks, data)
+    tomorrow = lmdutils.get_date_ymd('tomorrow')
+    labels = []
+    totals = []
+    unresolved = []
+    for week in weeks:
+        date = week['start'].strftime('%m-%d')
+        labels.append(date)
+        if week['start'] < tomorrow:
+            total = week['resolved'] + week['unresolved']
+            totals.append(total)
+            unresolved.append(week['unresolved'])
+        else:
+            totals.append(None)
+            unresolved.append(None)
+
+    return {'labels': labels, 'totals': totals, 'unresolved': unresolved}
 
 
 def mk_table(data):
@@ -109,9 +216,8 @@ def mk_doughnut(data):
 
 
 def get_stats(bugs):
-    m2 = [bug['id'] for bug in bugs if bug['cf_fission_milestone'] == 'M2']
-    m2_patch = get_bugs_with_patch(m2)
-
+    extra_m2 = get_milestone_extra_info(bugs, 'M2')
+    burndown_m2 = mk_burndown(M2_START_DATE, M2_END_DATE, extra_m2)
     total_milestones = len(bugs)
     milestones = {'M1': [], 'M2': [], 'M3': [], '?': [], 'Future': []}
     milestones_stats = {k: 0 for k in milestones.keys()}
@@ -128,7 +234,7 @@ def get_stats(bugs):
         status[s] = status.get(s, 0) + 1
 
         if m == 'M2' and s in {'NEW', 'ASSIGNED', 'RESOLVED'}:
-            if bug['id'] in m2_patch:
+            if extra_m2[bug['id']]['patch']:
                 s += ' with patch'
             status_m2[s] = status_m2.get(s, 0) + 1
 
@@ -137,7 +243,8 @@ def get_stats(bugs):
             dom[c] = dom.get(c, 0) + 1
 
     for m, data in milestones.items():
-        milestones[m] = mk_table(data)
+        if m != 'M1':
+            milestones[m] = mk_table(data)
 
     return {
         'stats': {
@@ -146,6 +253,7 @@ def get_stats(bugs):
             'dom': mk_doughnut(dom),
             'milestones': mk_doughnut(milestones_stats),
             'totalMilestones': total_milestones,
+            'burndown': burndown_m2,
         },
         'tables': {'milestones': milestones},
     }

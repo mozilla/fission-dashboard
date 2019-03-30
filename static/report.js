@@ -62,6 +62,46 @@ function doughnut(canvasId, data) {
   }
 }
 
+function burndown(canvasId, data) {
+  const canvas = document.getElementById("canvas_" + canvasId);
+  const ctx = canvas.getContext("2d");
+  if (canvas.chart === undefined) {
+    canvas.chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        datasets: [{
+          label: "Total",
+          data: data.totals,
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "blue",
+          borderColor: "blue",
+        }, {
+          label: "Unresolved",
+          data: data.unresolved,
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "red",
+          borderColor: "red",
+        }],
+        labels: data.labels,
+      },
+      maintainAspectRatio: false,
+      responsive: false,
+      options: {
+        legend: {
+          display: true,
+        },
+      },
+    });
+  } else {
+    canvas.chart.data.datasets[0].data = data.totals;
+    canvas.chart.data.datasets[1].data = data.unresolved;
+    canvas.chart.data.labels = data.labels;
+    canvas.chart.update();
+  }
+}
+
 function doughnuts(data) {
   const stats = data.stats;
   doughnut("ticket_per_milestone", stats.milestones);
@@ -150,7 +190,7 @@ function resize(thead, tbody) {
 function updateTables(data) {
   const tables = data.tables.milestones;
   const allTables = document.getElementById("all-tables");
-  const milestones = ["M2", "M3", "?", "Future", "M1"];
+  const milestones = ["M2", "M3", "?", "Future"];
   const children = allTables.children;
   const add = children.length == 0;
   for (let i in milestones) {
@@ -167,6 +207,7 @@ function updateTables(data) {
 
 function updateAll(data) {
   doughnuts(data);
+  burndown("burndown", data.stats.burndown);
   updateMilestonesTotal(data);
   updateTables(data);
 }
