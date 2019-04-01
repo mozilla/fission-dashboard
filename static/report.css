@@ -88,3 +88,29 @@ td:nth-child(7), th:nth-child(7) { width: 10%; }
     display: table-cell;
     width: 50%;
 }
+
+.nav {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+}
+
+.nav div {
+    display: inline-block;
+    width: 33.33%;
+}
+
+.nav .left {
+    float: left;
+    text-align: left;
+}
+
+.nav .right {
+    float: right;
+    text-align: right;
+}
+
+.nav .center {
+    text-align: center;
+}
