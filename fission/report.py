@@ -8,6 +8,7 @@ import dateutil.parser
 import libmozdata.utils as lmdutils
 from libmozdata.bugzilla import Bugzilla
 from libmozdata.connection import Connection
+from math import ceil
 import pytz
 
 
@@ -161,23 +162,43 @@ def mk_weeks_stats(weeks, data):
 
 def mk_burndown(start, end, data):
     weeks = mk_weeks(start, end)
+    periods = len(weeks)
     mk_weeks_stats(weeks, data)
     tomorrow = lmdutils.get_date_ymd('tomorrow')
     labels = []
     totals = []
+    _totals = []
     unresolved = []
-    for week in weeks:
-        date = week['start'].strftime('%m-%d')
+    forecasted = []
+    todo = None
+    for n, week in enumerate(weeks):
+        date = week['end'].strftime('%m-%d')
         labels.append(date)
+        total = week['resolved'] + week['unresolved']
+        _totals.append(total)
         if week['start'] < tomorrow:
-            total = week['resolved'] + week['unresolved']
             totals.append(total)
             unresolved.append(week['unresolved'])
         else:
             totals.append(None)
             unresolved.append(None)
 
-    return {'labels': labels, 'totals': totals, 'unresolved': unresolved}
+        # diff from the prev week
+        diff = 0 if len(_totals) == 1 else _totals[-1] - _totals[-2]
+        last = total if len(forecasted) == 0 else forecasted[-1] + diff
+        if diff != 0:
+            # we need to readjust because new bugs appeared
+            todo = ceil(last / (periods - n))
+        if todo is None:
+            todo = ceil(total / periods)
+        forecasted.append(max(0, last - todo))
+
+    return {
+        'labels': labels,
+        'totals': totals,
+        'unresolved': unresolved,
+        'forecasted': forecasted,
+    }
 
 
 def mk_table(data):
