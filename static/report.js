@@ -83,6 +83,13 @@ function burndown(canvasId, data) {
           lineTension: 0,
           backgroundColor: "red",
           borderColor: "red",
+        }, {
+          label: "Forecasted",
+          data: data.forecasted,
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "green",
+          borderColor: "green",
         }],
         labels: data.labels,
       },
