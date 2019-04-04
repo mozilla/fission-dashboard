@@ -27,7 +27,7 @@ WORKDIR /
 
 COPY --from=0 server.* /
 ADD Procfile .
-RUN sed -i 's/gunicorn/gunicorn --reload --reload-extra-file static --reload-extra-file templates --certfile=\/server.crt --keyfile=\/server.key/g' Procfile
+RUN sed -i 's/gunicorn/gunicorn --reload --reload-extra-file static --certfile=\/server.crt --keyfile=\/server.key/g' Procfile
 
 WORKDIR /code
 

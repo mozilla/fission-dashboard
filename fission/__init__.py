@@ -12,7 +12,7 @@ import os
 from . import cache
 
 
-app = Flask(__name__, template_folder='../templates', static_folder='../static')
+app = Flask(__name__, static_folder='../static')
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.secret_key = os.environ.get('SESSION_KEY')
