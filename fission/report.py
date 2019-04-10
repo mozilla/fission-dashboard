@@ -255,7 +255,7 @@ def get_stats(bugs):
         status[s] = status.get(s, 0) + 1
 
         if m == 'M2' and s in {'NEW', 'ASSIGNED', 'RESOLVED'}:
-            if extra_m2[bug['id']]['patch']:
+            if s == 'RESOLVED' and extra_m2[bug['id']]['patch']:
                 s += ' with patch'
             status_m2[s] = status_m2.get(s, 0) + 1
 
