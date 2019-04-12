@@ -88,6 +88,7 @@ function burndown(canvasId, data) {
           lineTension: 0,
           backgroundColor: "blue",
           borderColor: "blue",
+          link: data.total_link,
         }, {
           label: "Unresolved",
           data: data.unresolved,
@@ -95,7 +96,7 @@ function burndown(canvasId, data) {
           lineTension: 0,
           backgroundColor: "red",
           borderColor: "red",
-          link: data.unresolved_link
+          link: data.unresolved_link,
         }, {
           label: "Forecasted",
           data: data.forecasted,
@@ -114,9 +115,10 @@ function burndown(canvasId, data) {
         },
         onClick: function (e) {
           const activePoints = this.getElementAtEvent(e)[0];
-          if (activePoints && activePoints._datasetIndex == 1) {
+          if (activePoints && activePoints._datasetIndex <= 1) {
             const chartData = activePoints._chart.config.data;
-            window.open(chartData.datasets[1].link, "_blank");
+            const link = chartData.datasets[activePoints._datasetIndex].link;
+            window.open(link, "_blank");
           }
         }
       },

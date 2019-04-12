@@ -193,14 +193,13 @@ def mk_burndown(start, end, data):
             todo = ceil(total / periods)
         forecasted.append(max(0, last - todo))
 
-    url = 'https://bugzilla.mozilla.org/buglist.cgi?list_id=14664631&o1=equals&v1=M2&f1=cf_fission_milestone&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED'
-
     return {
         'labels': labels,
         'totals': totals,
         'unresolved': unresolved,
         'forecasted': forecasted,
-        'unresolved_link': url,
+        'unresolved_link': 'https://bugzilla.mozilla.org/buglist.cgi?list_id=14664631&o1=equals&v1=M2&f1=cf_fission_milestone&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED',
+        'total_link': 'https://bugzilla.mozilla.org/buglist.cgi?o1=equals&v1=M2&f1=cf_fission_milestone&list_id=14664661',
     }
 
 
