@@ -25,6 +25,7 @@ function doughnut(canvasId, data) {
       data: {
         datasets: [{
           data: data.data,
+          links: data.links,
           backgroundColor:["rgb(16, 97, 195)","rgb(234, 53, 46)","rgb(255, 141, 0)", "rgb(64, 177, 75)", "rgb(146, 16, 173)"]
         }],
         labels: data.labels,
@@ -53,6 +54,17 @@ function doughnut(canvasId, data) {
             fontFamily: "sans-serif",
           }
         },
+        onClick: function (e) {
+          const activePoints = this.getElementAtEvent(e)[0];
+          if (activePoints) {
+            const chartData = activePoints._chart.config.data;
+            const i = activePoints._index;
+            if (i < chartData.datasets[0].links.length) {
+              const link = chartData.datasets[0].links[i];
+              window.open(link, "_blank");
+            }
+          }
+        }
       },
     });
   } else {
@@ -83,6 +95,7 @@ function burndown(canvasId, data) {
           lineTension: 0,
           backgroundColor: "red",
           borderColor: "red",
+          link: data.unresolved_link
         }, {
           label: "Forecasted",
           data: data.forecasted,
@@ -99,6 +112,13 @@ function burndown(canvasId, data) {
         legend: {
           display: true,
         },
+        onClick: function (e) {
+          const activePoints = this.getElementAtEvent(e)[0];
+          if (activePoints && activePoints._datasetIndex == 1) {
+            const chartData = activePoints._chart.config.data;
+            window.open(chartData.datasets[1].link, "_blank");
+          }
+        }
       },
     });
   } else {

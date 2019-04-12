@@ -193,11 +193,14 @@ def mk_burndown(start, end, data):
             todo = ceil(total / periods)
         forecasted.append(max(0, last - todo))
 
+    url = 'https://bugzilla.mozilla.org/buglist.cgi?list_id=14664631&o1=equals&v1=M2&f1=cf_fission_milestone&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED'
+
     return {
         'labels': labels,
         'totals': totals,
         'unresolved': unresolved,
         'forecasted': forecasted,
+        'unresolved_link': url,
     }
 
 
@@ -233,7 +236,7 @@ def mk_doughnut(data):
     labels = [k for k, _ in data]
     data = [v for _, v in data]
 
-    return {'labels': labels, 'data': data}
+    return {'labels': labels, 'data': data, 'links': []}
 
 
 def get_stats(bugs):
@@ -243,7 +246,11 @@ def get_stats(bugs):
     milestones = {'M1': [], 'M2': [], 'M3': [], '?': [], 'Future': []}
     milestones_stats = {k: 0 for k in milestones.keys()}
     status = {}
-    status_m2 = {}
+    status_m2 = {
+        'labels': ['Open without patches', 'Open with patches', 'Resolved'],
+        'data': [0, 0, 0],
+        'links': [[], [], []],
+    }
     dom = {}
 
     for bug in bugs:
@@ -254,10 +261,17 @@ def get_stats(bugs):
         s = bug['status']
         status[s] = status.get(s, 0) + 1
 
-        if m == 'M2' and s in {'NEW', 'ASSIGNED', 'RESOLVED'}:
-            if s == 'RESOLVED' and extra_m2[bug['id']]['patch']:
-                s += ' with patch'
-            status_m2[s] = status_m2.get(s, 0) + 1
+        if m == 'M2':
+            if s in {'NEW', 'ASSIGNED', 'REOPENED'}:
+                if extra_m2[bug['id']]['patch']:
+                    status_m2['links'][1].append(str(bug['id']))
+                    status_m2['data'][1] += 1
+                else:
+                    status_m2['links'][0].append(str(bug['id']))
+                    status_m2['data'][0] += 1
+            else:
+                status_m2['links'][2].append(str(bug['id']))
+                status_m2['data'][2] += 1
 
         c = bug['component']
         if is_dom(c):
@@ -267,10 +281,15 @@ def get_stats(bugs):
         if m != 'M1':
             milestones[m] = mk_table(data)
 
+    for i, bugids in enumerate(status_m2['links']):
+        status_m2['links'][
+            i
+        ] = 'https://bugzilla.mozilla.org/buglist.cgi?bug_id=' + ','.join(bugids)
+
     return {
         'stats': {
             'status': mk_doughnut(status),
-            'statusM2': mk_doughnut(status_m2),
+            'statusM2': status_m2,
             'dom': mk_doughnut(dom),
             'milestones': mk_doughnut(milestones_stats),
             'totalMilestones': total_milestones,
