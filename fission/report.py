@@ -2,7 +2,24 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from libmozdata import config
+import os
+
+
+class ConfigEnv(config.Config):
+    def get(self, section, option, default=None, type=str):
+        res = os.environ.get('LIBMOZDATA_CFG_' + section.upper() + '_' + option.upper())
+        if not res:
+            return default
+        if type == list or type == set:
+            return type([s.strip(' /t') for s in res.split(',')])
+        return type(res)
+
+
+config.set_config(ConfigEnv())
+
 from bisect import bisect_left as bisect
+import copy
 import datetime
 import dateutil.parser
 import libmozdata.utils as lmdutils
@@ -18,8 +35,8 @@ MIMES = {
     'text/x-review-board-request',
 }
 Connection.CHUNK_SIZE = 128
-M2_START_DATE = '2019-02-25'
-M2_END_DATE = '2019-05-06'
+M3_START_DATE = '2019-05-06'
+M3_END_DATE = '2019-06-07'
 
 
 def get_date(s):
@@ -198,8 +215,8 @@ def mk_burndown(start, end, data):
         'totals': totals,
         'unresolved': unresolved,
         'forecasted': forecasted,
-        'unresolved_link': 'https://bugzilla.mozilla.org/buglist.cgi?list_id=14664631&o1=equals&v1=M2&f1=cf_fission_milestone&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED',
-        'total_link': 'https://bugzilla.mozilla.org/buglist.cgi?o1=equals&v1=M2&f1=cf_fission_milestone&list_id=14664661',
+        'unresolved_link': 'https://bugzilla.mozilla.org/buglist.cgi?list_id=14664631&o1=equals&v1=M3&f1=cf_fission_milestone&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED',
+        'total_link': 'https://bugzilla.mozilla.org/buglist.cgi?o1=equals&v1=M3&f1=cf_fission_milestone&list_id=14664661',
     }
 
 
@@ -239,18 +256,21 @@ def mk_doughnut(data):
 
 
 def get_stats(bugs):
+    extra_m3 = get_milestone_extra_info(bugs, 'M3')
     extra_m2 = get_milestone_extra_info(bugs, 'M2')
-    burndown_m2 = mk_burndown(M2_START_DATE, M2_END_DATE, extra_m2)
+    burndown_m3 = mk_burndown(M3_START_DATE, M3_END_DATE, extra_m3)
     total_milestones = len(bugs)
     milestones = {'M1': [], 'M2': [], 'M3': [], '?': [], 'Future': []}
     milestones_stats = {k: 0 for k in milestones.keys()}
     status = {}
-    status_m2 = {
+    status_m3 = {
         'labels': ['Open without patches', 'Open with patches', 'Resolved'],
         'data': [0, 0, 0],
         'links': [[], [], []],
     }
-    dom = {}
+    status_m2 = copy.deepcopy(status_m3)
+    status_infos = {'M2': status_m2, 'M3': status_m3}
+    extras = {'M2': extra_m2, 'M3': extra_m3}
 
     for bug in bugs:
         m = bug['cf_fission_milestone']
@@ -260,39 +280,37 @@ def get_stats(bugs):
         s = bug['status']
         status[s] = status.get(s, 0) + 1
 
-        if m == 'M2':
+        if m in status_infos:
+            info = status_infos[m]
             if s in {'NEW', 'ASSIGNED', 'REOPENED'}:
-                if extra_m2[bug['id']]['patch']:
-                    status_m2['links'][1].append(str(bug['id']))
-                    status_m2['data'][1] += 1
+                if extras[m][bug['id']]['patch']:
+                    info['links'][1].append(str(bug['id']))
+                    info['data'][1] += 1
                 else:
-                    status_m2['links'][0].append(str(bug['id']))
-                    status_m2['data'][0] += 1
+                    info['links'][0].append(str(bug['id']))
+                    info['data'][0] += 1
             else:
-                status_m2['links'][2].append(str(bug['id']))
-                status_m2['data'][2] += 1
-
-        c = bug['component']
-        if is_dom(c):
-            dom[c] = dom.get(c, 0) + 1
+                info['links'][2].append(str(bug['id']))
+                info['data'][2] += 1
 
     for m, data in milestones.items():
         if m != 'M1':
             milestones[m] = mk_table(data)
 
-    for i, bugids in enumerate(status_m2['links']):
-        status_m2['links'][
-            i
-        ] = 'https://bugzilla.mozilla.org/buglist.cgi?bug_id=' + ','.join(bugids)
+    for info in status_infos.values():
+        for i, bugids in enumerate(info['links']):
+            info['links'][
+                i
+            ] = 'https://bugzilla.mozilla.org/buglist.cgi?bug_id=' + ','.join(bugids)
 
     return {
         'stats': {
             'status': mk_doughnut(status),
+            'statusM3': status_m3,
             'statusM2': status_m2,
-            'dom': mk_doughnut(dom),
             'milestones': mk_doughnut(milestones_stats),
             'totalMilestones': total_milestones,
-            'burndown': burndown_m2,
+            'burndown': burndown_m3,
         },
         'tables': {'milestones': milestones},
     }

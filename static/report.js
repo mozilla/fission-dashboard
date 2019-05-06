@@ -134,9 +134,9 @@ function burndown(canvasId, data) {
 function doughnuts(data) {
   const stats = data.stats;
   doughnut("ticket_per_milestone", stats.milestones);
-  doughnut("per_dom_component", stats.dom);
-  doughnut("bug_status", stats.status);
   doughnut("m2_milestones", stats.statusM2);
+  doughnut("bug_status", stats.status);
+  doughnut("m3_milestones", stats.statusM3);
 }
 
 function updateMilestonesTotal(data) {
@@ -219,7 +219,7 @@ function resize(thead, tbody) {
 function updateTables(data) {
   const tables = data.tables.milestones;
   const allTables = document.getElementById("all-tables");
-  const milestones = ["M2", "M3", "?", "Future"];
+  const milestones = ["M3", "?", "Future", "M2"];
   const children = allTables.children;
   const add = children.length == 0;
   for (let i in milestones) {
