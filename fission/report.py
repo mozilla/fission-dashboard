@@ -261,7 +261,7 @@ def get_stats(bugs):
     extra_m2 = get_milestone_extra_info(bugs, 'M2')
     burndown_m3 = mk_burndown(M3_START_DATE, M3_END_DATE, extra_m3)
     total_milestones = len(bugs)
-    milestones = {'M1': [], 'M2': [], 'M3': [], '?': [], 'Future': []}
+    milestones = {'M1': [], 'M2': [], 'M3': [], 'M4': [], '?': [], 'Future': []}
     milestones_stats = {k: 0 for k in milestones.keys()}
     status = {}
     status_m3 = {
