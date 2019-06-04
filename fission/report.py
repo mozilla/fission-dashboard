@@ -36,7 +36,7 @@ MIMES = {
 }
 Connection.CHUNK_SIZE = 128
 M3_START_DATE = '2019-05-01'
-M3_END_DATE = '2019-06-07'
+M3_END_DATE = '2019-06-14'
 
 
 def get_date(s):
