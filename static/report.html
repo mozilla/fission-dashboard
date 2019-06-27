@@ -12,6 +12,7 @@
       init();
     </script>
     <link rel="stylesheet" href="report.css">
+    <script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>
   </head>
@@ -30,46 +31,47 @@
     <div class="info">
       <div class="stats">
         <div class="row">
-          <div class="item">
-            <div class="item-title">Tickets Per Milestone Total=<span id="total-milestones"></span></div>
+          <div class="item" style="width: 20%;">
+            <div class="item-title">M4 Milestones</div>
             <div>
-              <canvas id="canvas_ticket_per_milestone"></canvas>
+              <canvas id="canvas_m4_milestones"></canvas>
             </div>
           </div>
-          <div class="item">
-            <div class="item-title">M3 Milestones</div>
+          <div class="item" style="width: 50%;">
+            <div class="item-title">M4 by Assignees</div>
             <div>
-              <canvas id="canvas_m3_milestones"></canvas>
+              <canvas id="canvas_m4_assignees"></canvas>
+            </div>
+          </div>
+          <div class="item" style="width: 30%;">
+            <div class="item-title">M4 by Components</div>
+            <div>
+              <canvas id="canvas_m4_components"></canvas>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="item">
-            <div class="item-title">Bug Status</div>
+            <div class="item-title">M5 Milestones</div>
             <div>
-              <canvas id="canvas_bug_status"></canvas>
+              <canvas id="canvas_m5_milestones"></canvas>
             </div>
           </div>
           <div class="item">
-            <div class="item-title">M2 Milestones</div>
+            <div class="item-title">M5 by Assignees</div>
             <div>
-              <canvas id="canvas_m2_milestones"></canvas>
+              <canvas id="canvas_m5_assignees"></canvas>
+            </div>
+          </div>
+          <div class="item">
+            <div class="item-title">M5 by Components</div>
+            <div>
+              <canvas id="canvas_m5_components"></canvas>
             </div>
           </div>
         </div>
       </div>
-      <div class="item">
-        <div class="item-title">Key Resources</div>
-        <div class="resources">
-          <span class="resource"><a href="https://wiki.mozilla.org/Project_Fission" target="_blank">Fission Wiki</a></span>
-          <span class="resource"><a href="https://bugzilla.mozilla.org/buglist.cgi?classification=Client%20Software&classification=Developer%20Infrastructure&classification=Components&classification=Server%20Software&classification=Other&columnlist=product%2Ccomponent%2Cassigned_to%2Cshort_desc%2Cbug_status%2Cresolution%2Cstatus_whiteboard&f1=cf_fission_milestone&o1=equals&v1=M1&list_id=14636475" target="_blank">M1 Query</a></span>
-          <span class="resource"><a href="https://bugzilla.mozilla.org/buglist.cgi?o1=equals&v1=M2&f1=cf_fission_milestone&columnlist=product%2Ccomponent%2Cassigned_to%2Cshort_desc%2Cbug_status%2Cresolution%2Cstatus_whiteboard&classification=Client%20Software&classification=Developer%20Infrastructure&classification=Components&classification=Server%20Software&classification=Other&query_format=advanced&list_id=14636476" target="_blank">M2 Query</a></span>
-          <span class="resource"><a href="https://bugzilla.mozilla.org/buglist.cgi?o1=equals&v1=M3&f1=cf_fission_milestone&columnlist=product%2Ccomponent%2Cassigned_to%2Cshort_desc%2Cbug_status%2Cresolution%2Cstatus_whiteboard&classification=Client%20Software&classification=Developer%20Infrastructure&classification=Components&classification=Server%20Software&classification=Other&query_format=advanced&list_id=14636476" target="_blank">M3 Query</a></span>
-          <span class="resource"><a href="https://docs.google.com/spreadsheets/d/1jwYDrq0FDD0qNEN_-SXxgOAtaj15hGfH4Xna1v4qrec/edit#gid=0" target="_blank">Work Breakdown Document</a></span>
-          <span class="resource"><a href="https://mystor.github.io/fission-news-1.html" target="_blank">Fission Newsletter #1</a></span>
-        </div>
-      </div>
-      <div class="item">
+      <!--div class="item">
         <div class="item-title">Key Contacts</div>
         <div class="contacts">
           <span class="contact"><a href="https://wiki.mozilla.org/Project_Fission#Team" target="_blank">Fission Team List (Wiki)</a></span>
@@ -102,9 +104,9 @@
           <span class="contact">Security Lead: Tom Ritter</span>
           <span class="contact">Standards Lead: Anne van Kesteren</span>
         </div>
-      </div>
+      </div-->
     <div class="row">
-        <div class="item-title">M3 Burndown</div>
+        <div class="item-title">M4 Burndown</div>
         <div>
           <canvas style="height: 400px;width: 100%;" id="canvas_burndown"></canvas>
         </div>

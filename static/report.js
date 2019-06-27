@@ -20,13 +20,14 @@ function doughnut(canvasId, data) {
   const canvas = document.getElementById("canvas_" + canvasId);
   const ctx = canvas.getContext("2d");
   if (canvas.chart === undefined) {
+    let colors = palette('mpn65', data.labels.length).map(c => '#' + c);
     canvas.chart = new Chart(ctx, {
       type: "doughnut",
       data: {
         datasets: [{
           data: data.data,
           links: data.links,
-          backgroundColor:["rgb(16, 97, 195)","rgb(234, 53, 46)","rgb(255, 141, 0)", "rgb(64, 177, 75)", "rgb(146, 16, 173)"]
+          backgroundColor: colors,
         }],
         labels: data.labels,
       },
@@ -133,10 +134,12 @@ function burndown(canvasId, data) {
 
 function doughnuts(data) {
   const stats = data.stats;
-  doughnut("ticket_per_milestone", stats.milestones);
-  doughnut("m2_milestones", stats.statusM2);
-  doughnut("bug_status", stats.status);
-  doughnut("m3_milestones", stats.statusM3);
+  doughnut("m4_milestones", stats.statusM4);
+  doughnut("m5_milestones", stats.statusM5);
+  doughnut("m4_components", stats.componentsM4);
+  doughnut("m5_components", stats.componentsM5);
+  doughnut("m4_assignees", stats.assigneesM4);
+  doughnut("m5_assignees", stats.assigneesM5);
 }
 
 function updateMilestonesTotal(data) {
@@ -237,8 +240,8 @@ function updateTables(data) {
 function updateAll(data) {
   doughnuts(data);
   burndown("burndown", data.stats.burndown);
-  updateMilestonesTotal(data);
-  updateTables(data);
+  //updateMilestonesTotal(data);
+  //updateTables(data);
 }
 
 function update() {

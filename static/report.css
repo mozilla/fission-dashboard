@@ -76,7 +76,7 @@ td:nth-child(7), th:nth-child(7) { width: 10%; }
 
 .stats {
     display: table;
-    width: 80%;
+    width: 100%;
 }
 
 .row {
@@ -86,7 +86,6 @@ td:nth-child(7), th:nth-child(7) { width: 10%; }
 
 .row .item {
     display: table-cell;
-    width: 50%;
 }
 
 .nav {
